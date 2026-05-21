@@ -70,7 +70,7 @@ export function FixtureCard({ home = "TBC", away = "TBC", group, played = false,
 
 export function FixturesToggle({ value, onChange }) {
   const buttonClass = (active) => `rounded-full px-3 py-2 text-xs font-black uppercase transition-all ${active ? "bg-[#0B5F35] text-[#F5F0E6] shadow-sm" : "bg-transparent text-[#0B5F35]/72"}`;
-  return <div className="grid grid-cols-2 gap-2 rounded-full border border-[#0B5F35]/10 bg-[#EFE7D8] p-1 shadow-inner"><button onClick={() => onChange("group")} className={buttonClass(value === "group")}>League</button><button onClick={() => onChange("knockout")} className={buttonClass(value === "knockout")}>Playoffs</button></div>;
+  return <div className="grid grid-cols-2 gap-2 rounded-full border border-[#0B5F35]/10 bg-[#EFE7D8] p-1 shadow-inner"><button onClick={() => onChange("group")} className={buttonClass(value === "group")}>Groups</button><button onClick={() => onChange("knockout")} className={buttonClass(value === "knockout")}>Knockout</button></div>;
 }
 
 export function FixtureSection({ title, children }) {
@@ -80,9 +80,9 @@ export function FixtureSection({ title, children }) {
 export function FixturesScreen({ fixtureView, onFixtureViewChange, schedule, menuProps, knockoutFixtures, userTeam = null }) {
   const round32 = mergeFixtures(buildRound32Placeholders(), knockoutFixtures);
   return <main className="flex min-h-0 flex-1 flex-col gap-2"><ScreenTitle {...menuProps}>SCHEDULE</ScreenTitle><FixturesToggle value={fixtureView} onChange={onFixtureViewChange} /><section className="min-h-0 flex-1 overflow-auto py-1"><div className="space-y-3">
-    {fixtureView === "group" && Array.from({ length: 11 }, (_, index) => index + 1).map((round) => <FixtureSection key={round} title={`MATCHDAY ${round}`}>{schedule.filter((fixture) => fixture.week === round).map((fixture) => <FixtureCard key={fixture.id} {...fixture} userTeam={userTeam} />)}</FixtureSection>)}
+    {fixtureView === "group" && [1, 2, 3].map((round) => <FixtureSection key={round} title={`MATCHDAY ${round}`}>{schedule.filter((fixture) => fixture.week === round).map((fixture) => <FixtureCard key={fixture.id} {...fixture} userTeam={userTeam} />)}</FixtureSection>)}
     {fixtureView === "knockout" && KO_ROUNDS.map(([label, nums]) => {
-      const fixtures = label === "Semi-finals" ? round32 : mergeFixtures(buildPlaceholderFixtures(label, nums), knockoutFixtures);
+      const fixtures = label === "Round of 32" ? round32 : mergeFixtures(buildPlaceholderFixtures(label, nums), knockoutFixtures);
       return <FixtureSection key={label} title={label}>{fixtures.map((fixture) => <FixtureCard key={fixture.id || fixture.matchNo} {...fixture} userTeam={userTeam} />)}</FixtureSection>;
     })}
   </div></section></main>;

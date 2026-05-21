@@ -112,29 +112,49 @@ export function GroupTable({ title, rows, qualifiedTeams = new Set(), userTeam =
 
 function KnockoutBracket({ round32 = [], podium = {}, userTeam = null }) {
   const allFixtures = round32;
-  const semiFinals = mergeByMatchNo(buildRound32Placeholders(), allFixtures);
+  const r32 = mergeByMatchNo(buildRound32Placeholders(), allFixtures);
+  const r16 = mergeByMatchNo(placeholderFixtures("Round of 16"), allFixtures);
+  const qf = mergeByMatchNo(placeholderFixtures("Quarter-finals"), allFixtures);
+  const sf = mergeByMatchNo(placeholderFixtures("Semi-finals"), allFixtures);
   const final = mergeByMatchNo(placeholderFixtures("Final"), allFixtures);
+  const third = mergeByMatchNo(placeholderFixtures("3RD PLACE PLAY-OFF"), allFixtures);
   const finalFixture = final[0];
+  const thirdFixture = third[0];
   const winner = podium.winner || winnerOf(finalFixture);
   const runnerUp = podium.runnerUp || runnerUpOf(finalFixture);
+  const thirdPlace = podium.third || winnerOf(thirdFixture);
 
   return <div className="mx-auto w-[94%] overflow-hidden rounded-[1.6rem] bg-[#EFE7D8] text-[#072D1D] ring-1 ring-[#0B5F35]/8 shadow-[0_8px_24px_rgba(7,45,29,0.04)]">
-    <div className="bg-[#0B5F35] px-3 py-2.5 text-center text-[17px] font-black tracking-[-0.025em] text-[#F5F0E6]">FINAL FOUR PLAYOFFS</div>
-    <div className="px-3 pb-4 pt-3">
-      <StageLabel>SEMI-FINALS</StageLabel>
-      <div className="mt-2"><BracketRow count={2} fixtures={semiFinals} gap="gap-5" layout="horizontal" userTeam={userTeam} /></div>
+    <div className="bg-[#0B5F35] px-3 py-2.5 text-center text-[17px] font-black tracking-[-0.025em] text-[#F5F0E6]">TOURNAMENT BRACKET</div>
+    <div className="px-2 pb-2 pt-2" style={{ zoom: 0.86 }}>
+      <StageLabel>ROUND OF 32</StageLabel>
+      <div className="mt-1.5"><BracketRow count={8} fixtures={r32.slice(0, 8)} gap="gap-[1px]" layout="vertical" userTeam={userTeam} /></div>
+
+      <div className="mt-3"><StageLabel>ROUND OF 16</StageLabel><div className="mt-1.5"><BracketRow count={4} fixtures={r16.slice(0, 4)} gap="gap-3" layout="horizontal" userTeam={userTeam} /></div></div>
+      <div className="mt-4"><StageLabel>QUARTER-FINALS</StageLabel><div className="mt-1.5"><BracketRow count={2} fixtures={qf.slice(0, 2)} gap="gap-8" layout="horizontal" userTeam={userTeam} /></div></div>
+      <div className="mt-4"><StageLabel>SEMI-FINALS</StageLabel><div className="mt-1.5"><BracketRow count={1} fixtures={sf.slice(0, 1)} layout="horizontal" userTeam={userTeam} /></div></div>
+
       <div className="mt-5 grid grid-cols-3 items-center gap-2">
-        <PodiumBox title="CHAMPIONS" team={winner} className="bg-[#D8B62F]" />
-        <div><StageLabel>FINAL</StageLabel><div className="mt-2"><BracketFixture fixture={finalFixture} layout="vertical" userTeam={userTeam} /></div></div>
-        <PodiumBox title="RUNNER-UP" team={runnerUp} className="bg-[#C8C8C8]" />
+        <div><StageLabel><span className="block">3RD PLACE</span><span className="block">PLAY-OFF</span></StageLabel><div className="mt-1.5"><BracketFixture fixture={thirdFixture} layout="vertical" userTeam={userTeam} /></div></div>
+        <div className="flex flex-col items-center gap-2">
+          <PodiumBox title="CHAMPIONS" team={winner} className="bg-[#D8B62F]" />
+          <PodiumBox title="RUNNER-UP" team={runnerUp} className="bg-[#C8C8C8]" />
+          <PodiumBox title="THIRD" team={thirdPlace} className="bg-[#D9822B]" />
+        </div>
+        <div><StageLabel><span className="block">MONDAY CUP</span><span className="block">FINAL</span></StageLabel><div className="mt-1.5"><BracketFixture fixture={finalFixture} layout="vertical" userTeam={userTeam} /></div></div>
       </div>
+
+      <div className="mt-4"><StageLabel>SEMI-FINALS</StageLabel><div className="mt-1.5"><BracketRow count={1} fixtures={sf.slice(1, 2)} layout="horizontal" userTeam={userTeam} /></div></div>
+      <div className="mt-4"><StageLabel>QUARTER-FINALS</StageLabel><div className="mt-1.5"><BracketRow count={2} fixtures={qf.slice(2, 4)} gap="gap-8" layout="horizontal" userTeam={userTeam} /></div></div>
+      <div className="mt-3"><StageLabel>ROUND OF 16</StageLabel><div className="mt-1.5"><BracketRow count={4} fixtures={r16.slice(4, 8)} gap="gap-3" layout="horizontal" userTeam={userTeam} /></div></div>
+      <div className="mt-3"><StageLabel>ROUND OF 32</StageLabel><div className="mt-1.5"><BracketRow count={8} fixtures={r32.slice(8, 16)} gap="gap-[1px]" layout="vertical" userTeam={userTeam} /></div></div>
     </div>
   </div>;
 }
 
 export function GroupsScreen({ allGroups, menuProps, standingsView, onStandingsViewChange, knockoutFixtures, qualifiedTeams = new Set(), userTeam = null, podium = {} }) {
   return <main className="flex min-h-0 flex-1 flex-col gap-2"><ScreenTitle {...menuProps}>STANDINGS</ScreenTitle><FixturesToggle value={standingsView} onChange={onStandingsViewChange} /><section className="min-h-0 flex-1 overflow-auto py-1"><div className="space-y-2">
-    {standingsView === "group" && allGroups.map(({ group, rows }) => <GroupTable key={group} title={group === "League" ? "BALLER LEAGUE" : `GROUP ${group}`} rows={rows} qualifiedTeams={qualifiedTeams} userTeam={userTeam} />)}
+    {standingsView === "group" && allGroups.map(({ group, rows }) => <GroupTable key={group} title={`GROUP ${group}`} rows={rows} qualifiedTeams={qualifiedTeams} userTeam={userTeam} />)}
     {standingsView === "knockout" && <KnockoutBracket round32={knockoutFixtures} podium={podium} userTeam={userTeam} />}
   </div></section></main>;
 }

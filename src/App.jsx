@@ -10,9 +10,13 @@ import { MatchScreen } from "./components/match/MatchScreen.jsx";
 runSelfTests();
 
 const stageKeyFromMatchNo = (matchNo) => {
-  if (matchNo === 67 || matchNo === 68) return "semiFinal";
-  if (matchNo === 69) return "final";
-  return "semiFinal";
+  if (matchNo >= 73 && matchNo <= 88) return "round32";
+  if (matchNo >= 89 && matchNo <= 96) return "round16";
+  if (matchNo >= 97 && matchNo <= 100) return "quarterFinal";
+  if (matchNo === 101 || matchNo === 102) return "semiFinal";
+  if (matchNo === 103) return "thirdPlace";
+  if (matchNo === 104) return "final";
+  return "round32";
 };
 
 function toGameFixture(fixture, fallbackStage = "group") {
@@ -43,10 +47,39 @@ function userScoreFromFixtureResult(result, userTeam) {
 }
 
 function calculateEarlyQualifiedTeams(table, schedule, fullQualifiers, groupStageComplete) {
-  if (groupStageComplete) return new Set(fullQualifiers.topFour.map((row) => row.team));
-  return new Set();
-}
+  const qualified = new Set();
 
+  if (groupStageComplete) {
+    GROUP_LETTERS.forEach((group) => {
+      fullQualifiers.byGroup[group].slice(0, 2).forEach((row) => qualified.add(row.team));
+    });
+    fullQualifiers.best3RDs.forEach((row) => qualified.add(row.team));
+    return qualified;
+  }
+
+  // Early qualification check for top-two places. A team is marked Q as soon as
+  // fewer than two teams in its group can still finish above or level with it on points.
+  GROUP_LETTERS.forEach((group) => {
+    const groupTeams = GROUPS[group];
+    groupTeams.forEach((teamName) => {
+      const row = table[teamName];
+      if (row.pts >= 6) {
+        qualified.add(teamName);
+        return;
+      }
+      const challengers = groupTeams.filter((otherTeam) => {
+        if (otherTeam === teamName) return false;
+        const otherRow = table[otherTeam];
+        const remaining = schedule.filter((fixture) => !fixture.played && fixture.group === group && (fixture.home === otherTeam || fixture.away === otherTeam)).length;
+        return otherRow.pts + remaining * 3 >= row.pts;
+      }).length;
+
+      if (row.played > 0 && challengers < 2) qualified.add(teamName);
+    });
+  });
+
+  return qualified;
+}
 
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -54,7 +87,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [fixtureView, setFixtureView] = useState("group");
   const [standingsView, setStandingsView] = useState("group");
-  const [selectedGroup, setSelectedGroup] = useState("League");
+  const [selectedGroup, setSelectedGroup] = useState("A");
   const [team, setTeam] = useState(null);
   const [opponent, setOpponent] = useState("");
   const [score, setScore] = useState([0, 0]);
@@ -83,7 +116,7 @@ export default function App() {
   const currentFixture = currentKnockoutMatch ? toGameFixture(currentKnockoutMatch) : toGameFixture(activeGroupFixture);
 
   const closeMenu = () => setMenuOpen(false);
-  const resetTournament = () => { setScreen("home"); setDrawer(null); setMenuOpen(false); setFixtureView("group"); setStandingsView("group"); setSelectedGroup("League"); setTeam(null); setOpponent(""); setScore([0, 0]); setMatchResult(null); setModalDismissed(false); setTable(blankTable()); setSchedule(buildSchedule()); setKnockoutFixtures([]); setCurrentKnockoutMatch(null); setPodium({}); setMatchStage("GROUP STAGE"); };
+  const resetTournament = () => { setScreen("home"); setDrawer(null); setMenuOpen(false); setFixtureView("group"); setStandingsView("group"); setSelectedGroup("A"); setTeam(null); setOpponent(""); setScore([0, 0]); setMatchResult(null); setModalDismissed(false); setTable(blankTable()); setSchedule(buildSchedule()); setKnockoutFixtures([]); setCurrentKnockoutMatch(null); setPodium({}); setMatchStage("GROUP STAGE"); };
   const openMatch = () => { closeMenu(); setDrawer(null); };
   const openFixtures = () => { closeMenu(); setFixtureView(groupStageComplete ? "knockout" : "group"); setDrawer("fixtures"); };
   const openGroups = () => { closeMenu(); setStandingsView(groupStageComplete ? "knockout" : standingsView); setDrawer("groups"); };
@@ -160,9 +193,12 @@ export default function App() {
       setKnockoutFixtures(updatedFixtures);
       if (completedPodium) setPodium(completedPodium);
       const matchNo = playedUserMatch.matchNo;
+      const lostSemiFinal = !result.userWon && (matchNo === 101 || matchNo === 102);
       let status = "eliminated";
-      if (matchNo === 69) status = result.userWon ? "champion" : "runnerUp";
+      if (matchNo === 103) status = result.userWon ? "third" : "fourth";
+      else if (matchNo === 104) status = result.userWon ? "champion" : "runnerUp";
       else if (result.userWon) status = "knockoutWin";
+      else if (lostSemiFinal) status = "thirdPlace";
       setModalDismissed(false);
       setMatchResult({
         home: playedUserMatch.home,
@@ -208,7 +244,7 @@ export default function App() {
   const nextMatch = () => {
     if (!team || !matchResult) return;
 
-    if (false && matchResult.status === "thirdPlace") {
+    if (matchResult.status === "thirdPlace") {
       const nextFixture = matchResult.nextFixture || knockoutFixtures.find((fixture) => fixture.matchNo === 103 && (fixture.home === team || fixture.away === team));
       if (nextFixture) {
         setCurrentKnockoutMatch(nextFixture);
@@ -223,7 +259,7 @@ export default function App() {
       }
     }
 
-    if (["eliminated", "runnerUp"].includes(matchResult.status)) { resetTournament(); return; }
+    if (["eliminated", "runnerUp", "third", "fourth"].includes(matchResult.status)) { resetTournament(); return; }
 
     if (matchResult.status === "champion") {
       setCurrentKnockoutMatch(null);
