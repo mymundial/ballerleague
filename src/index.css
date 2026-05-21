@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --baller-yellow: #efff00;
+  --baller-black: #030303;
+  --baller-panel: #171717;
+  --baller-panel-soft: #202020;
+  --baller-line: rgba(255, 255, 255, 0.14);
+  --baller-muted: rgba(255, 255, 255, 0.56);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(239,255,0,0.06), transparent 28%),
+    radial-gradient(circle at 80% 48%, rgba(255,255,255,0.045), transparent 30%),
+    linear-gradient(180deg, #050505 0%, #000 100%);
+}
+
+.baller-shell {
+  position: relative;
+  min-height: 100dvh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px 42px;
+}
+
+.baller-topbar {
+  height: 130px;
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.hamburger { width: 50px; display: grid; gap: 8px; }
+.hamburger span { height: 5px; border-radius: 99px; background: white; box-shadow: 0 0 9px rgba(255,255,255,.25); }
+.nav { display: flex; justify-content: center; gap: clamp(46px, 9vw, 120px); height: 100%; align-items: center; }
+.nav button { position: relative; height: 100%; color: #fff; background: transparent; border: 0; font-size: 27px; font-weight: 1000; letter-spacing: -0.04em; text-transform: uppercase; text-shadow: 0 4px 12px rgba(255,255,255,.16); cursor: pointer; }
+.nav button.active { color: var(--baller-yellow); }
+.nav button.active::after { content: ""; position: absolute; height: 4px; border-radius: 99px; left: -48px; right: -48px; bottom: 0; background: var(--baller-yellow); box-shadow: 0 0 16px rgba(239,255,0,.75); }
+.season { border: 2px solid var(--baller-yellow); border-radius: 999px; color: #fff; padding: 16px 22px; font-size: 16px; font-weight: 1000; background: #101010; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+
+.matchdays { margin: 62px 0 42px; width: min(900px, 78vw); display: grid; grid-template-columns: repeat(12, 1fr); align-items: center; gap: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 8px; }
+.matchdays button { border: 0; background: transparent; color: #f8f8f8; height: 54px; border-radius: 99px; font-size: 25px; font-weight: 1000; cursor: pointer; }
+.matchdays button.active { background: var(--baller-yellow); color: #000; box-shadow: 0 0 18px rgba(239,255,0,.42); }
+
+.fixture-list { display: grid; gap: 16px; }
+.fixture-card { display: grid; grid-template-columns: 92px minmax(120px,1fr) 72px 110px 72px minmax(120px,1.15fr); align-items: center; gap: 18px; min-height: 108px; padding: 18px 28px; border-radius: 9px; background: linear-gradient(90deg, rgba(255,255,255,.105), rgba(255,255,255,.07)); box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 18px 34px rgba(0,0,0,.2); }
+.time { color: rgba(255,255,255,.52); font-size: 20px; }
+.team-name { font-size: 22px; font-weight: 1000; text-transform: uppercase; line-height: 1.08; letter-spacing: -0.04em; }
+.home-name { text-align: right; }
+.score { color: var(--baller-yellow); font-size: 32px; font-weight: 1000; text-align: center; letter-spacing: .04em; }
+.badge { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 50%; background: var(--team-bg); color: var(--team-text); border: 2px solid var(--team-accent); font-weight: 1000; font-size: 16px; letter-spacing: -.08em; box-shadow: 0 0 0 2px rgba(0,0,0,.45), 0 0 18px color-mix(in srgb, var(--team-accent), transparent 50%); }
+
+.ad-board { margin: 20px 0 30px; min-height: 180px; border: 2px solid var(--baller-yellow); border-radius: 10px; display: grid; grid-template-columns: 1fr 1.15fr; align-items: center; padding: 28px 54px; background: #030303; box-shadow: 0 0 20px rgba(239,255,0,.12), inset 0 0 30px rgba(255,255,255,.025); }
+.ad-brand { display: flex; align-items: center; gap: 28px; }
+.ad-brand img { width: 112px; height: 112px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255,255,255,.15)); }
+.ad-brand strong { font-size: clamp(34px, 5vw, 52px); font-weight: 1000; line-height: .92; text-transform: uppercase; letter-spacing: -.06em; }
+.ad-copy strong { font-size: clamp(34px, 5vw, 52px); font-weight: 1000; line-height: .9; text-transform: uppercase; letter-spacing: -.06em; }
+.ad-copy .yellow { color: var(--baller-yellow); }
+.ad-copy p { margin: 14px 0 0; font-size: 21px; letter-spacing: .02em; color: rgba(255,255,255,.86); text-transform: uppercase; }
+.ad-copy span { color: var(--baller-yellow); font-size: 34px; margin-left: 18px; }
+
+.section-title { margin: 0 0 18px 12px; color: var(--baller-yellow); font-size: clamp(44px, 6vw, 62px); font-weight: 1000; line-height: .9; text-transform: uppercase; letter-spacing: -.07em; text-shadow: 0 0 18px rgba(239,255,0,.32); }
+.section-rule { height: 4px; background: var(--baller-yellow); margin-bottom: 32px; box-shadow: 0 0 12px rgba(239,255,0,.65); }
+.table-panel { overflow: hidden; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.105), rgba(255,255,255,.07)); padding: 24px 22px 10px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+.table-row { display: grid; grid-template-columns: 52px 78px minmax(260px,1fr) repeat(6, 78px); align-items: center; min-height: 72px; border-bottom: 1px solid var(--baller-line); font-size: 22px; font-weight: 900; }
+.table-row.header { min-height: 42px; color: rgba(255,255,255,.5); font-size: 20px; text-transform: uppercase; font-weight: 1000; }
+.table-row.qualify-line { border-bottom: 3px solid var(--baller-yellow); }
+.table-team { text-transform: uppercase; letter-spacing: -.035em; }
+.numeric { text-align: center; }
+.pts { color: var(--baller-yellow); font-size: 26px; font-weight: 1000; }
+.qualify-note { padding: 18px 0 8px; color: rgba(255,255,255,.42); text-align: center; font-size: 19px; font-weight: 1000; text-transform: uppercase; }
+
+.menu-popover { position: absolute; right: 28px; top: 136px; z-index: 20; width: 238px; border: 1px solid rgba(255,255,255,.18); border-top: 3px solid var(--baller-yellow); border-radius: 8px; background: linear-gradient(160deg,#161616,#0d0d0d); box-shadow: 0 18px 50px rgba(0,0,0,.5); overflow: hidden; }
+.menu-popover button { display: block; width: 100%; padding: 20px 28px; background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,.12); color: #fff; text-align: left; font-size: 20px; font-weight: 1000; text-transform: uppercase; cursor: pointer; }
+.menu-popover button.active { color: var(--baller-yellow); }
+.menu-popover button.danger { color: #ff4a4a; }
+
+.playoffs { min-height: 450px; display: grid; place-items: center; text-align: center; color: rgba(255,255,255,.72); font-size: 28px; font-weight: 1000; text-transform: uppercase; background: linear-gradient(90deg, rgba(255,255,255,.105), rgba(255,255,255,.07)); border-radius: 9px; }
+.manager { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 900; margin-top: 3px; text-transform: uppercase; }
+
+@media (max-width: 820px) {
+  .baller-shell { padding: 0 14px 26px; }
+  .baller-topbar { height: 88px; grid-template-columns: 52px 1fr auto; }
+  .hamburger { width: 34px; gap: 6px; }
+  .hamburger span { height: 4px; }
+  .nav { gap: 22px; }
+  .nav button { font-size: 15px; }
+  .nav button.active::after { left: -12px; right: -12px; }
+  .season { padding: 10px 12px; font-size: 11px; }
+  .matchdays { margin: 32px 0 24px; width: 100%; }
+  .matchdays button { height: 38px; font-size: 16px; }
+  .fixture-card { grid-template-columns: 48px 1fr 42px 62px 42px 1fr; gap: 8px; min-height: 82px; padding: 12px 10px; }
+  .time { font-size: 14px; }
+  .team-name { font-size: 13px; }
+  .score { font-size: 20px; }
+  .badge { width: 38px; height: 38px; font-size: 11px; }
+  .ad-board { grid-template-columns: 1fr; gap: 18px; padding: 20px; }
+  .ad-brand img { width: 70px; height: 70px; }
+  .ad-brand strong, .ad-copy strong { font-size: 34px; }
+  .table-panel { overflow-x: auto; }
+  .table-row { min-width: 760px; grid-template-columns: 42px 58px minmax(190px,1fr) repeat(6, 64px); font-size: 17px; }
+}
